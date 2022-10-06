@@ -24,7 +24,13 @@ class DLList<T> {
 
     //copy constructor (deep copy -> two separete lists with the exact same info in the,, simply seperate)
     public DLList(DLList<T> other) {
+        this();
 
+        DLListNode<T> otherCur = other.front;
+        while (otherCur != null) {
+            insertLast(otherCur.data);
+            otherCur = otherCur.next;
+        }
     }
 
     //clear list method, its purpose is to set front to null, back to null, current to null, size to 0, and index to -1
@@ -238,6 +244,19 @@ class DLList<T> {
     //delete last method
     public boolean deleteLast() {
         return last() && deleteAt();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder data = new StringBuilder();
+        DLListNode<T> cur = front;
+
+        while(cur != null) {
+            data.append(cur.data.toString()).append("\n");
+            cur = cur.next;
+        }
+
+        return data.toString();
     }
 
 }
