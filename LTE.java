@@ -155,6 +155,16 @@ class LTE {
                         searchForward(arguments[0]);
                         break;
                     }
+                    case "s": {
+                        substituteInLine(arguments[0], arguments[1]);
+                        break;
+                    }
+                    case "sr": {
+                        int start = Integer.parseInt(arguments[2]);
+                        int stop = Integer.parseInt(arguments[3]);
+                        substituteRange(arguments[0], arguments[1], start, stop);
+                        break;
+                    }
                     case "d": {
                         deleteCurrent();
                         break;
@@ -395,6 +405,28 @@ class LTE {
         }
     }
 
+    private static void substituteRange(String s1, String s2, int start, int end) {
+        if(!checkIndicesAndPrint(start, end)) return;
+
+        DLList<String> data = buffer.getList();
+        int index = data.getIndex();
+
+        data.seek(start-1);
+
+        while(start <= end) {
+            String line = data.getData().replace(s1, s2);
+            data.setData(line);
+            data.next();
+            start++;
+        }
+
+        data.seek(index);
+    }
+
+    private static void substituteInLine(String s1, String s2) {
+        int index = buffer.getList().getIndex()+1;
+        substituteRange(s1, s2, index, index);
+    }
 
     private static boolean deleteRange(int start, int end) {
         if (!copyRange(start, end)) return false;
@@ -414,7 +446,7 @@ class LTE {
     }
 
     private static boolean copyRange(int start, int end) {
-        if (!checkRangeDeleteCopy(start, end)) return false;
+        if (!checkIndicesAndPrint(start, end)) return false;
 
         String cp = buffer.getList().getDataInRange(start - 1, end - 1);
 
@@ -479,7 +511,7 @@ class LTE {
         return !str.isEmpty() ? str.toString() : null;
     }
 
-    private static boolean checkRangeDeleteCopy(int start, int end) {
+    private static boolean checkIndicesAndPrint(int start, int end) {
         if (isEmpty()) return false;
 
         if (start > end || !checkRange(start) || !checkRange(end)) {
@@ -551,6 +583,8 @@ class LTE {
         commands.add(new Command("pr", 2, "start stop", "Print several lines"));
         commands.add(new Command("?", 1, "pattern", "Search backwards for a pattern"));
         commands.add(new Command("/", 1, "pattern", "Search forwards for a pattern"));
+        commands.add(new Command("s", 2, "text1 text2", "Substitute all occurrences of text1 with text2 on current line"));
+        commands.add(new Command("sr", 4, "text1 text2 start stop", "Substitute all occurrences of text1 with text2 between start and stop"));
         commands.add(new Command("d", 0, "", "Delete the current line from buffer and copy into the clipboard (CUT)"));
         commands.add(new Command("dr", 2, "start stop", "Delete several lines from buffer and copy into the clipboard (CUT"));
         commands.add(new Command("c", 0, "", "Copy current line into clipboard (COPY)"));

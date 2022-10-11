@@ -255,15 +255,6 @@ class DLList<T> {
 
     @Override
     public String toString() {
-//        StringBuilder data = new StringBuilder();
-//        DLListNode<T> cur = front;
-//
-//        while(cur != null) {
-//            data.append(cur.data.toString()).append("\n");
-//            cur = cur.next;
-//        }
-//
-//        return data.toString();
         return getDataInRange(0, getSize()-1);
     }
 
