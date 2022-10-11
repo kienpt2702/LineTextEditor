@@ -124,7 +124,6 @@ class DLList<T> {
                 index++;
             }
         }
-
         return true;
     }
 
@@ -160,6 +159,14 @@ class DLList<T> {
         size++;
 
         return true;
+    }
+
+    public boolean addBelowCurrent(T item) {
+        if(next()) return insertAt(item);
+
+        if(insertEmpty(new DLListNode<>(item))) return true;
+
+        return insertLast(item);
     }
 
     //insert last method
@@ -248,16 +255,36 @@ class DLList<T> {
 
     @Override
     public String toString() {
-        StringBuilder data = new StringBuilder();
-        DLListNode<T> cur = front;
+//        StringBuilder data = new StringBuilder();
+//        DLListNode<T> cur = front;
+//
+//        while(cur != null) {
+//            data.append(cur.data.toString()).append("\n");
+//            cur = cur.next;
+//        }
+//
+//        return data.toString();
+        return getDataInRange(0, getSize()-1);
+    }
 
-        while(cur != null) {
-            data.append(cur.data.toString()).append("\n");
-            cur = cur.next;
+    public String getDataInRange(int start, int end) {
+        if(isEmpty() ||start > end || start < 0 || end >= getSize()) return null;
+
+        DLListNode<T> position = current;
+        int i = getIndex();
+        seek(start);
+
+        StringBuilder data = new StringBuilder();
+        while (start <= end) {
+            data.append(current.data.toString());
+            if(start != end) data.append("\n");
+            next();
+            start++;
         }
+        current = position;
+        index = i;
 
         return data.toString();
     }
-
 }
  

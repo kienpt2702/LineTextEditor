@@ -7,8 +7,8 @@ public class CommandLine {
     private String[] arguments;
     private Scanner sc;
 
-    public CommandLine() {
-        sc = new Scanner(System.in);
+    public CommandLine(Scanner sc) {
+        this.sc = sc;
     }
 
     public void readLine() {

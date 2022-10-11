@@ -3,11 +3,10 @@ public class Buffer {
     private String filespec;
     private boolean dirty;
     private DLList<String> list;
-    public static int count;
 
     public Buffer() {
         list = new DLList<>();
-        filespec = "untitled" + count++;
+        filespec = "untitled";
         dirty = false;
     }
 
