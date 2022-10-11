@@ -570,8 +570,7 @@ public class LTE {
     private static String readLine() {
         StringBuilder str = new StringBuilder();
         while (true) {
-            cmd.readLine();
-            String line = cmd.getCommand();
+            String line = sc.nextLine();
             if (line.equals(".")) break;
             str.append(line).append("\n");
         }
