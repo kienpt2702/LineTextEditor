@@ -1,4 +1,4 @@
-class DLList<T> {
+public class DLList<T> {
     private class DLListNode<T> {
         //data members
         public T data;

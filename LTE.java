@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-class LTE {
+public class LTE {
     private static Buffer buffer;
     private static Buffer clipboard;
     private static CommandLine cmd;
@@ -45,13 +45,23 @@ class LTE {
 
     public static void main(String[] args) {
         System.out.println("LTE Project");
-
         buffer = new Buffer();
         clipboard = new Buffer();
         sc = new Scanner(System.in);
         cmd = new CommandLine(sc);
         commands = new ArrayList<>();
         generateCommand();
+
+        if (args.length > 1) {
+            System.out.println("Invalid Number of Filenames");
+            return;
+        }
+
+        startProgram(args);
+    }
+
+    private static void startProgram(String[] args) {
+        if (args.length == 1) readFile(args[0]);
 
         int count = 1;
         while (!done) {
@@ -84,6 +94,10 @@ class LTE {
 
             try {
                 switch (cmd.getCommand()) {
+                    case "h": {
+                        help();
+                        break;
+                    }
                     case "q!": {
                         forceQuit();
                         break;
@@ -212,6 +226,55 @@ class LTE {
         }
     }
 
+    private static void help() {
+        System.out.println("==========================================================================");
+        System.out.println("|| Command    |     Arguments         | Description ");
+        System.out.println("||     h      |                       | Display help");
+        System.out.println("||     r      |   filespec            | Read a file into the current buffer");
+        System.out.println("||     w      |                       | Write the current buffer to a file on disk");
+        System.out.println("||     f      |   filespec            | Change the name of the current buffer");
+        System.out.println("||     q      |                       | Quit the line editor");
+        System.out.println("||     q!     |                       | Quit the line editor without saving");
+        System.out.println("||     t      |                       | Go to the first line in the buffer");
+        System.out.println("||     b      |                       | Go to the last line in the buffer");
+        System.out.println("||     g      |   num                 | Go to line num in the buffer");
+        System.out.println("||     -      |                       | Go to the previous line");
+        System.out.println("||     +      |                       | Go to the next line");
+        System.out.println("||     =      |                       | Print the current line number");
+        System.out.println("||     n      |                       | Toggle line number displayed");
+        System.out.println("||     #      |                       | Print the number of lines and");
+        System.out.println("||            |                       | characters in the buffer");
+        System.out.println("||     p      |                       | Print the current line");
+        System.out.println("||     pr     |   start stop          | Print several line");
+        System.out.println("||     ?      |   pattern             | Search backwards for a pattern");
+        System.out.println("||     /      |   pattern             | Search forwards for a pattern");
+        System.out.println("||     c      |                       | Copy current line into clipboard (COPY)");
+        System.out.println("||     s      |   text1 text2         | Substitute all occurrences of text1");
+        System.out.println("||            |                       | with text2 on current line");
+        System.out.println("||     sr     | start stop text1 text2| Substitute all occurrences of text1");
+        System.out.println("||            |                       | with text2 between start and stop");
+        System.out.println("||     d      |                       | Delete the current line from buffer ");
+        System.out.println("||            |                       | and copy into the clipboard (CUT)");
+        System.out.println("||     dr     |   start stop          | Delete several lines from buffer and");
+        System.out.println("||            |                       | copy into the clipboard (CUT)");
+        System.out.println("||     cr     |   start stop          | Copy lines between start and stop into");
+        System.out.println("||            |                       | the clipboard (COPY)");
+        System.out.println("||     pa     |                       | Paste the contents of the clipboard");
+        System.out.println("||            |                       | above the current line (PASTE)");
+        System.out.println("||     pb     |                       | Paste the contents of the clipboard");
+        System.out.println("||            |                       | below the current line (PASTE)");
+        System.out.println("||     ia     |                       | Insert new lines of text above the current");
+        System.out.println("||            |                       | line until ”.” appears ");
+        System.out.println("||            |                       | on its own line");
+        System.out.println("||     ic     |                       | Insert new lines of text at the current");
+        System.out.println("||            |                       | line until ”.” appears on its");
+        System.out.println("||            |                       | own line (REPLACE current line)");
+        System.out.println("||     ib     |                       | Insert new lines of text after the");
+        System.out.println("||            |                       | current line until ”.” appears on");
+        System.out.println("||            |                       | its own line");
+        System.out.println("==========================================================================");
+
+    }
 
     // need to fix
     // Reading a file will overwrite the contents of the current buffer.
@@ -219,17 +282,22 @@ class LTE {
     private static void read() {
         if (buffer.hasChanged()) {
             // update clipboard
+            System.out.print("Save file " + buffer.getFileName() + "(y/n)?: ");
+            String s = sc.nextLine();
+            if (s.equalsIgnoreCase("y")) write();
+
             clipboard.setList(new DLList<>(buffer.getList()));
-            buffer.clear();
         }
 
         readFile(cmd.getArguments()[0]);
-        buffer.setDirty(true);
     }
 
     private static void readFile(String fileName) {
         try {
             BufferedReader br = new BufferedReader(new FileReader(fileName));
+            buffer.clear();
+            buffer.setFileName(fileName);
+            buffer.setDirty(false);
 
             String s;
             while ((s = br.readLine()) != null) {
@@ -385,7 +453,7 @@ class LTE {
     }
 
     private static void searchForward(String pattern) {
-        if(isEmpty()) return;
+        if (isEmpty()) return;
 
         int start = buffer.getList().getIndex();
         boolean found = false;
@@ -406,14 +474,14 @@ class LTE {
     }
 
     private static void substituteRange(String s1, String s2, int start, int end) {
-        if(!checkIndicesAndPrint(start, end)) return;
+        if (!checkIndicesAndPrint(start, end)) return;
 
         DLList<String> data = buffer.getList();
         int index = data.getIndex();
 
-        data.seek(start-1);
+        data.seek(start - 1);
 
-        while(start <= end) {
+        while (start <= end) {
             String line = data.getData().replace(s1, s2);
             data.setData(line);
             data.next();
@@ -424,7 +492,7 @@ class LTE {
     }
 
     private static void substituteInLine(String s1, String s2) {
-        int index = buffer.getList().getIndex()+1;
+        int index = buffer.getList().getIndex() + 1;
         substituteRange(s1, s2, index, index);
     }
 
