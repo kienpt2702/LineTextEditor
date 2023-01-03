@@ -3,8 +3,7 @@
 The command syntax is described below. An internal copy of a file is maintained as a list of text lines (strings). In
 order to move freely up and down the file, the internal data structure is a doubly linked-list of lines (Java Strings). 
 
-The program read from standard input (keyboard) and write to standard output (ter-
-minal screen).
+The program read from standard input (keyboard) and write to standard output (terminal screen).
 
 ## Editor Commands
 
